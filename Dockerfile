@@ -1,8 +1,4 @@
-# syntax=docker/dockerfile:1
-# Dockerfile for https://hub.docker.com/r/mariusbegby/cadence/
-# Images automatically published: docker pull mariusbegby/cadence
-
-ARG NODE_VERSION=20.12
+ARG NODE_VERSION=22
 
 # Use Node.js image as the base image
 FROM node:${NODE_VERSION}-bookworm-slim
@@ -14,21 +10,21 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y python3 make build-essential ffmpeg ca-certificates \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm
 
 # Copy only necessary source files
-COPY package*.json ./ 
+COPY package.json pnpm-lock.yaml ./ 
 COPY tsconfig.json ./ 
 COPY src/ ./src/ 
 COPY config/ ./config/ 
 COPY locales/ ./locales/ 
 
-# Install node dependencies
-RUN pnpm install
+# Fetch dependencies to virtual store
+RUN pnpm fetch
 
-# Install mediaplex
-RUN pnpm install mediaplex
+# Install dependencies
+RUN pnpm install --offline --frozen-lockfile
 
 # Build the application
 RUN pnpm build

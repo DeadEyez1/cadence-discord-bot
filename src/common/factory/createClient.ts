@@ -13,7 +13,12 @@ export const createClient = async ({ executionId }: { executionId: string }): Pr
         logger.debug('Creating discord.js client...');
 
         const client: Client = new Discord.Client({
-            intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildVoiceStates]
+            intents: [
+                Discord.GatewayIntentBits.Guilds,
+                Discord.GatewayIntentBits.GuildVoiceStates,
+                Discord.GatewayIntentBits.GuildMessages,
+                Discord.GatewayIntentBits.MessageContent
+            ]
         });
 
         return client;
